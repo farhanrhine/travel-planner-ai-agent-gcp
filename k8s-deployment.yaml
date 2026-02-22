@@ -16,23 +16,23 @@ spec:
     spec:
       containers:
         - name: streamlit-container
-          image: streamlit-app:latest
+          image: streamlit-app:latest # this should match the image name you used in docker build
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8501
           envFrom:
             - secretRef:
-                name: llmops-secrets
+                name: llmops-secrets # this for the secret we created with kubectl create secret generic
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: streamlit-service
+  name: streamlit-service # this is the name of the service, you can choose any name you like
 spec:
   type: LoadBalancer
   selector:
     app: streamlit
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 8501
+      port: 80 # this is the port that will be exposed outside the cluster
+      targetPort: 8501 # this streamlit's default port, it should match the containerPort in the deployment
