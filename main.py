@@ -1,27 +1,35 @@
-# from langchain_groq import ChatGroq
-# # from src.config.config import GROQ_API_KEY
+"""CLI entry point for the Travel Planner AI Agent."""
 
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
+from src.core.planner import TravelPlanner
 
-# load_dotenv()
+load_dotenv()
 
 
-# llm = ChatGroq(
-#     model="qwen/qwen3-32b",
-#     temperature=0,
-#     max_tokens=None,
-#     reasoning_format="parsed",
-#     timeout=None,
-#     max_retries=2,
-#     # other params...
-# )
+def main():
+    print("=" * 50)
+    print("  ✈️  AI Travel Itinerary Planner")
+    print("=" * 50)
 
-# messages = [
-#     (
-#         "system",
-#         "You are a helpful assistant that translates English to French. Translate the user sentence.",
-#     ),
-#     ("human", "I love programming."),
-# ]
-# ai_msg = llm.invoke(messages)
-# print(ai_msg.content)
+    city = input("\nEnter the city name for your trip: ").strip()
+    interests = input("Enter your interests (comma-separated): ").strip()
+
+    if not city or not interests:
+        print("❌ Both city and interests are required.")
+        return
+
+    planner = TravelPlanner()
+    planner.set_city(city)
+    planner.set_interests(interests)
+
+    print("\n⏳ Generating your itinerary...\n")
+    itinerary = planner.create_itinerary()
+
+    print("=" * 50)
+    print("📄 Your Itinerary")
+    print("=" * 50)
+    print(itinerary)
+
+
+if __name__ == "__main__":
+    main()
