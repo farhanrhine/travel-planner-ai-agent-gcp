@@ -1,18 +1,20 @@
 # ✈️ AI Travel Agent Planner
 
-An AI-powered travel planning agent built with **LangChain's `create_agent`** and **Streamlit**. Enter a city and your interests — the agent generates a detailed day trip plan with an **interactive route map**.
+An AI-powered travel planning agent built with **LangChain's `create_agent`** and **Streamlit**. Enter a city and your interests — or just **speak** to the agent — and it generates a detailed day trip plan with an **interactive route map** and a **voice summary**.
 
 ## Workflow
 
-![Travel Planner Workflow](workflow.png)
+![Travel Planner Workflow](workflow.svg)
 
 ## App Flow
 
-![App Flow](app-flow.png)
+![App Flow](app-flow.svg)
 
 ## Features
 
 - **AI Agent** — Uses `create_agent` from LangChain (LangGraph-powered)
+- **Voice Capabilities** — Speak your request naturally with **Speech-to-Text** (Whisper)
+- **Audio Narrator** — Listen to a high-quality summary of your plan with **Text-to-Speech** (Orpheus)
 - **Chat Streaming** — Responses stream token by token in real-time
 - **Reasoning Toggle** — AI thinking is hidden behind a collapsible button
 - **Route Map** — Interactive Folium map with numbered stops and colored route lines
@@ -21,6 +23,8 @@ An AI-powered travel planning agent built with **LangChain's `create_agent`** an
 ## Tech Stack
 
 - **LLM**: Groq (Qwen 3 32B) via `langchain-groq`
+- **Speech-to-Text**: Whisper Large V3 Turbo (via Groq)
+- **Text-to-Speech**: Orpheus V1 English (via Groq)
 - **Agent**: `langchain.agents.create_agent` (LangChain v1.2.9)
 - **Frontend**: Streamlit
 - **Maps**: Folium + Geopy (Nominatim geocoding)
@@ -43,7 +47,7 @@ travel-planner-ai-agent/
 │
 ├── src/
 │   ├── agent/
-│   │   └── travel_agent.py      # create_agent setup, streaming, location extraction
+│   │   └── travel_agent.py      # create_agent, streaming, location/voice parsing
 │   ├── core/
 │   │   └── planner.py           # TravelPlanner class (manages state)
 │   ├── config/
@@ -51,7 +55,8 @@ travel-planner-ai-agent/
 │   └── utils/
 │       ├── logger.py            # File-based logging setup
 │       ├── custom_exception.py  # Custom exception with file/line info
-│       └── map_utils.py         # Geocoding + Folium route map generation
+│       ├── map_utils.py         # Geocoding + Folium route map generation
+│       └── audio_utils.py       # Groq Whisper and Orpheus integration
 │
 ├── k8s-deployment.yaml           # Kubernetes deployment + service
 ├── elasticsearch.yaml            # Elasticsearch for log storage
@@ -118,11 +123,12 @@ uv run python main.py
 
 ## How It Works
 
-1. User enters a **city** and **interests**
-2. `create_agent` invokes the Groq LLM with a system prompt
-3. Response **streams** token by token — reasoning is hidden behind a toggle
-4. After streaming, the AI **extracts location names** from the plan
-5. Locations are **geocoded** (Nominatim) and plotted on an **interactive Folium map**
+1. **Input**: User either types their request (✍️ **Type** tab) or speaks it (🎤 **Speak** tab).
+2. **STT**: If spoken, **Whisper** transcribes the audio, and the LLM extracts the city and interests.
+3. **Agent**: `create_agent` invokes the Groq LLM to generate the detailed travel plan.
+4. **Streaming**: The response streams in real-time, with AI reasoning hidden behind a toggle expander.
+5. **TTS**: After generation, the LLM creates a short narrated summary, which **Orpheus** converts to audio for playback.
+6. **MAPPING**: The AI extracts location names from the plan, geocodes them via **Nominatim**, and plots them on an **interactive Folium map**.
 
 ## Docker
 

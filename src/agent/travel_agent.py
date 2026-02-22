@@ -127,3 +127,87 @@ def extract_locations(travel_plan_text: str, city: str) -> list[str]:
         logger.error(f"Failed to parse locations: {e}")
 
     return []
+
+
+def parse_voice_input(transcript: str) -> dict:
+    """Extract city and interests from a voice transcript using LLM.
+
+    Args:
+        transcript: The raw transcribed text from speech-to-text.
+
+    Returns:
+        Dict with "city" (str) and "interests" (list[str]).
+        Returns empty values if parsing fails.
+    """
+    logger.info(f"Parsing voice input: {transcript}")
+
+    result = model.invoke([
+        {
+            "role": "system",
+            "content": (
+                "Extract the city and interests from the user's travel request. "
+                "Return ONLY a JSON object like: "
+                '{"city": "Dubai", "interests": ["food", "history", "adventure"]}. '
+                "No explanation, no thinking tags, no markdown."
+            ),
+        },
+        {"role": "user", "content": transcript},
+    ])
+
+    try:
+        content = result.content.strip()
+        content = _re.sub(r"<think>.*?</think>", "", content, flags=_re.DOTALL).strip()
+        # Find JSON object in response
+        match = _re.search(r"\{.*\}", content, _re.DOTALL)
+        if match:
+            parsed = json.loads(match.group())
+            city = parsed.get("city", "")
+            interests = parsed.get("interests", [])
+            logger.info(f"Parsed voice input — city: {city}, interests: {interests}")
+            return {"city": city, "interests": interests}
+    except (json.JSONDecodeError, Exception) as e:
+        logger.error(f"Failed to parse voice input: {e}")
+
+    return {"city": "", "interests": []}
+
+
+def generate_audio_summary(travel_plan_text: str) -> str:
+    """Create a short, spoken-style summary of the travel plan for TTS.
+
+    Args:
+        travel_plan_text: The full travel plan markdown.
+
+    Returns:
+        A short (max 700 chars) summary meant for narration.
+    """
+    logger.info("Generating spoken summary for TTS...")
+
+    result = model.invoke([
+        {
+            "role": "system",
+            "content": (
+                "You are the voice of a friendly travel agent. "
+                "Convert the provided travel plan into a short spoken script of 100-120 words. "
+                "RULES: "
+                "1. Speak directly to the user (e.g., 'Welcome to Dubai! We'll start at...') "
+                "2. NO markdown, NO bullet points, NO special characters like #, *, or -. "
+                "3. NO introductory text like 'Here is your summary' or 'I have summarized'. "
+                "4. ONLY output the transcript to be read out loud. "
+                "5. Stop immediately if you approach 120 words."
+            ),
+        },
+        {"role": "user", "content": f"Plan to transcribe:\n\n{travel_plan_text}"},
+    ])
+
+    summary = result.content.strip()
+    
+    # 1. Clean out any leftover markdown or meta-tags
+    summary = _re.sub(r"<think>.*?</think>", "", summary, flags=_re.DOTALL).strip()
+    summary = _re.sub(r"[#*_\\-]", "", summary)
+    
+    # 2. Strict character limit for TTS model safety (approx 1200 tokens)
+    if len(summary) > 850:
+        summary = summary[:850].rsplit(' ', 1)[0] + "." # Clean cut at last word
+    
+    logger.info(f"Final spoken transcript ({len(summary)} chars): {summary[:100]}...")
+    return summary

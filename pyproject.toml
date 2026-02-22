@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "folium>=0.20.0",
     "geopy>=2.4.1",
+    "groq>=0.25.0",
     "langchain>=1.2.9",
     "langchain-community>=0.4.1",
     "langchain-core>=1.2.9",
