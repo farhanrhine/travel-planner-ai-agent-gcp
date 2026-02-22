@@ -24,5 +24,4 @@ AI_TRAVEL_AGENT.egg-info/
 .DS_Store
 Thumbs.db
 
-understanding-for-travel-agent.md
-travel-agent-deployment.md
+docs/
