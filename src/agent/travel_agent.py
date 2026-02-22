@@ -12,12 +12,12 @@ logger = get_logger(__name__)
 
 # --- System Prompt ---
 TRAVEL_SYSTEM_PROMPT = (
-    "You are an expert travel planner assistant. "
+    "You are an expert AI travel agent. "
     "When the user provides a city and their interests, create a detailed, "
-    "well-structured day trip itinerary. "
+    "well-structured day trip plan. "
     "Include timings, location names, and short descriptions for each stop. "
     "Format the output with bullet points and clear sections (Morning, Afternoon, Evening). "
-    "Make the itinerary practical, enjoyable, and tailored to the user's interests."
+    "Make the plan practical, enjoyable, and tailored to the user's interests."
 )
 
 # --- LLM ---
@@ -40,10 +40,10 @@ travel_agent = create_agent(
 logger.info("Travel agent created successfully using create_agent")
 
 
-def generate_itinerary(city: str, interests: list[str]) -> str:
-    """Generate a travel itinerary (non-streaming, for CLI usage)."""
+def generate_travel_plan(city: str, interests: list[str]) -> str:
+    """Generate a travel plan (non-streaming, for CLI usage)."""
     user_message = (
-        f"Create a day trip itinerary for {city} "
+        f"Create a day trip plan for {city} "
         f"based on my interests: {', '.join(interests)}."
     )
 
@@ -58,18 +58,18 @@ def generate_itinerary(city: str, interests: list[str]) -> str:
     return ai_message.content
 
 
-def stream_itinerary(city: str, interests: list[str]):
-    """Stream itinerary tokens from the travel agent.
+def stream_travel_plan(city: str, interests: list[str]):
+    """Stream travel plan tokens from the travel agent.
 
     Yields:
         str: Individual text chunks as they are generated.
     """
     user_message = (
-        f"Create a day trip itinerary for {city} "
+        f"Create a day trip plan for {city} "
         f"based on my interests: {', '.join(interests)}."
     )
 
-    logger.info(f"Streaming itinerary for city={city}, interests={interests}")
+    logger.info(f"Streaming travel plan for city={city}, interests={interests}")
 
     for event in travel_agent.stream(
         {"messages": [{"role": "user", "content": user_message}]},

@@ -1,13 +1,13 @@
 import re
 import streamlit as st
-from src.agent.travel_agent import stream_itinerary
+from src.agent.travel_agent import stream_travel_plan
 from dotenv import load_dotenv
 
 load_dotenv()
 
-st.set_page_config(page_title="AI Travel Planner", page_icon="✈️", layout="centered")
-st.title("✈️ AI Travel Itinerary Planner")
-st.caption("Plan your day trip itinerary by entering your city and interests")
+st.set_page_config(page_title="AI Travel Agent Planner", page_icon="✈️", layout="centered")
+st.title("✈️ AI Travel Agent Planner")
+st.caption("Your smart AI agent that plans the perfect day trip — just tell it where and what you love!")
 
 # --- Session State ---
 if "chat_history" not in st.session_state:
@@ -30,7 +30,7 @@ with st.form("planner_form", clear_on_submit=True):
         city = st.text_input("🏙️ City", placeholder="e.g. Dubai, Paris, Tokyo")
     with col2:
         interests = st.text_input("🎯 Interests", placeholder="e.g. food, history, adventure")
-    submitted = st.form_submit_button("🗺️ Generate Itinerary", use_container_width=True)
+    submitted = st.form_submit_button("🗺️ Plan My Trip", use_container_width=True)
 
 # --- Handle Submission ---
 if submitted:
@@ -59,7 +59,7 @@ if submitted:
 
             status_placeholder.status("🧠 AI is reasoning...", state="running")
 
-            for chunk in stream_itinerary(city, interests_list):
+            for chunk in stream_travel_plan(city, interests_list):
                 full_response += chunk
 
                 # --- Detect <think> start ---
@@ -105,7 +105,6 @@ if submitted:
                 content_buffer = full_response.split("</think>", 1)[-1].strip()
             else:
                 content_buffer = full_response.strip()
-                # Clean any stray think tags
                 content_buffer = re.sub(r"<think>.*?</think>", "", content_buffer, flags=re.DOTALL).strip()
 
             # Remove the cursor
