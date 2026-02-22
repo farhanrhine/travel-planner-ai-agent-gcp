@@ -24,6 +24,5 @@ AI_TRAVEL_AGENT.egg-info/
 .DS_Store
 Thumbs.db
 
-# Personal docs (not for GitHub)
-FULL-DOCUMENTATION-deployment.md
-understanding.md
+understanding-for-travel-agent.md
+travel-agent-deployment.md
