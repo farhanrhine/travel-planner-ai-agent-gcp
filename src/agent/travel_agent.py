@@ -3,6 +3,8 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+import json
+import re as _re
 from langchain.agents import create_agent
 from langchain_groq import ChatGroq
 from langchain_core.messages import AIMessageChunk
@@ -80,3 +82,48 @@ def stream_travel_plan(city: str, interests: list[str]):
             yield msg.content
 
     logger.info("Streaming completed")
+
+
+def extract_locations(travel_plan_text: str, city: str) -> list[str]:
+    """Extract location/place names from the travel plan using LLM.
+
+    Args:
+        travel_plan_text: The full travel plan text.
+        city: The destination city.
+
+    Returns:
+        List of location name strings in visit order.
+    """
+    logger.info(f"Extracting locations from travel plan for {city}")
+
+    result = model.invoke([
+        {
+            "role": "system",
+            "content": (
+                "You are a location extractor. Given a travel plan, extract ONLY the "
+                "specific place/landmark/location names in the order they appear. "
+                "Return ONLY a JSON array of strings. No explanation, no thinking, no markdown. "
+                "Example: [\"Burj Khalifa\", \"Dubai Mall\", \"Dubai Marina\"]"
+            ),
+        },
+        {
+            "role": "user",
+            "content": f"Extract location names from this {city} travel plan:\n\n{travel_plan_text}",
+        },
+    ])
+
+    try:
+        # Try to parse JSON from the response
+        content = result.content.strip()
+        # Remove <think>...</think> if present
+        content = _re.sub(r"<think>.*?</think>", "", content, flags=_re.DOTALL).strip()
+        # Find the JSON array in the response
+        match = _re.search(r"\[.*\]", content, _re.DOTALL)
+        if match:
+            locations = json.loads(match.group())
+            logger.info(f"Extracted {len(locations)} locations: {locations}")
+            return locations
+    except (json.JSONDecodeError, Exception) as e:
+        logger.error(f"Failed to parse locations: {e}")
+
+    return []

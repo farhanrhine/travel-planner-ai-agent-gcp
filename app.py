@@ -1,6 +1,8 @@
 import re
 import streamlit as st
-from src.agent.travel_agent import stream_travel_plan
+from streamlit_folium import st_folium
+from src.agent.travel_agent import stream_travel_plan, extract_locations
+from src.utils.map_utils import geocode_locations, create_route_map
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,6 +24,11 @@ for entry in st.session_state.chat_history:
             with st.expander("💭 View AI Reasoning", expanded=False):
                 st.markdown(entry["thinking"])
         st.markdown(entry["content"])
+        if entry.get("map_data"):
+            with st.expander("🗺️ View Route Map", expanded=True):
+                route_map = create_route_map(entry["map_data"])
+                if route_map:
+                    st_folium(route_map, use_container_width=True, height=400, returned_objects=[])
 
 # --- Input Form ---
 with st.form("planner_form", clear_on_submit=True):
@@ -56,6 +63,7 @@ if submitted:
             status_placeholder = st.empty()
             thinking_expander_placeholder = st.empty()
             content_placeholder = st.empty()
+            map_placeholder = st.empty()
 
             status_placeholder.status("🧠 AI is reasoning...", state="running")
 
@@ -93,7 +101,7 @@ if submitted:
                     content_buffer = full_response.split("</think>", 1)[-1].strip()
                     content_placeholder.markdown(content_buffer + "▌")
 
-                # --- No thinking tags at all (model doesn't use them) ---
+                # --- No thinking tags at all ---
                 if not in_thinking and not thinking_done and "<think>" not in full_response:
                     content_buffer = full_response
                     content_placeholder.markdown(content_buffer + "▌")
@@ -110,9 +118,27 @@ if submitted:
             # Remove the cursor
             content_placeholder.markdown(content_buffer)
 
+            # --- Generate Route Map ---
+            map_data = None
+            with map_placeholder.container():
+                with st.spinner("📍 Plotting locations on map..."):
+                    try:
+                        locations = extract_locations(content_buffer, city)
+                        if locations:
+                            geocoded = geocode_locations(locations, city)
+                            if geocoded:
+                                map_data = geocoded
+                                route_map = create_route_map(geocoded)
+                                if route_map:
+                                    st.markdown("### 🗺️ Your Route Map")
+                                    st_folium(route_map, use_container_width=True, height=400, returned_objects=[])
+                    except Exception as e:
+                        st.info(f"Could not generate map: {e}")
+
             # Save to history
             st.session_state.chat_history.append({
                 "query": user_query,
                 "thinking": thinking_buffer if thinking_buffer else None,
                 "content": content_buffer,
+                "map_data": map_data,
             })
