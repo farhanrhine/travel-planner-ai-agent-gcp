@@ -68,9 +68,10 @@ travel-planner-ai-agent/
 │   └── skills/
 │       └── excalidraw-diagram-generator/  # Skill for generating diagrams
 │
-├── workflow.png                  # Project workflow diagram
-├── app-flow.png                  # App flow diagram
+├── workflow.svg                  # Project workflow diagram (vector)
+├── app-flow.svg                  # App flow diagram (vector)
 ├── workflow.excalidraw           # Editable workflow (Excalidraw)
+├── app-flow.excalidraw           # Editable app flow (Excalidraw)
 ```
 
 ### ⚠️ Agent Skills
