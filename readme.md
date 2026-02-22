@@ -6,6 +6,10 @@ An AI-powered travel planning agent built with **LangChain's `create_agent`** an
 
 ![Travel Planner Workflow](workflow.png)
 
+## App Flow
+
+![App Flow](app-flow.png)
+
 ## Features
 
 - **AI Agent** — Uses `create_agent` from LangChain (LangGraph-powered)
@@ -21,6 +25,7 @@ An AI-powered travel planning agent built with **LangChain's `create_agent`** an
 - **Frontend**: Streamlit
 - **Maps**: Folium + Geopy (Nominatim geocoding)
 - **Logging**: Python `logging` → file-based logs
+- **Package Manager**: uv
 - **Deployment**: Docker + Kubernetes
 - **Monitoring**: ELK Stack (Elasticsearch, Logstash, Kibana, Filebeat)
 
@@ -28,38 +33,65 @@ An AI-powered travel planning agent built with **LangChain's `create_agent`** an
 
 ```
 travel-planner-ai-agent/
-├── app.py                    # Streamlit web app (main entry point)
-├── main.py                   # CLI entry point
-├── pyproject.toml            # Dependencies (managed with uv)
-├── Dockerfile                # Docker container config
-├── .env                      # API keys (not committed)
+├── app.py                        # Streamlit web app (main entry point)
+├── main.py                       # CLI entry point
+├── pyproject.toml                # Dependencies (managed with uv)
+├── Dockerfile                    # Docker container (Python 3.12 + uv)
+├── .dockerignore                 # Excludes dev tools from Docker image
+├── .env                          # API keys (not committed)
+├── .gitignore                    # Git ignore rules
 │
 ├── src/
 │   ├── agent/
-│   │   └── travel_agent.py   # create_agent setup, streaming, location extraction
+│   │   └── travel_agent.py      # create_agent setup, streaming, location extraction
 │   ├── core/
-│   │   └── planner.py        # TravelPlanner class (manages state)
+│   │   └── planner.py           # TravelPlanner class (manages state)
 │   ├── config/
-│   │   └── config.py         # Environment variable loading
+│   │   └── config.py            # Environment variable loading
 │   └── utils/
-│       ├── logger.py         # File-based logging setup
+│       ├── logger.py            # File-based logging setup
 │       ├── custom_exception.py  # Custom exception with file/line info
-│       └── map_utils.py      # Geocoding + Folium route map generation
+│       └── map_utils.py         # Geocoding + Folium route map generation
 │
-├── k8s-deployment.yaml       # Kubernetes deployment + service
-├── elasticsearch.yaml        # Elasticsearch for log storage
-├── logstash.yaml             # Logstash pipeline config
-├── kibana.yaml               # Kibana dashboard
-└── filebeat.yaml             # Filebeat log collector (DaemonSet)
+├── k8s-deployment.yaml           # Kubernetes deployment + service
+├── elasticsearch.yaml            # Elasticsearch for log storage
+├── logstash.yaml                 # Logstash pipeline config
+├── kibana.yaml                   # Kibana dashboard
+├── filebeat.yaml                 # Filebeat log collector (DaemonSet)
+│
+├── .agent/
+│   └── skills/
+│       └── excalidraw-diagram-generator/  # Skill for generating diagrams
+│
+├── workflow.png                  # Project workflow diagram
+├── app-flow.png                  # App flow diagram
+├── workflow.excalidraw           # Editable workflow (Excalidraw)
+└── FULL DOCUMENTATION.md         # Detailed project documentation
 ```
+
+### ⚠️ Agent Skills
+
+This project uses **[AI agent skills](https://github.com/github/awesome-copilot)** to extend capabilities (e.g., generating Excalidraw diagrams).
+
+**How to install skills:**
+
+```bash
+# Browse available skills
+npx skills
+
+# Add a specific skill to the project
+npx skills add https://github.com/github/awesome-copilot --skill excalidraw-diagram-generator
+```
+
+> **Note:** Skills are dev tools only — they are excluded from the Docker image via `.dockerignore` but pushed to GitHub for local development.
 
 ## Setup
 
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/your-username/travel-planner-ai-agent.git
-cd travel-planner-ai-agent
+git clone https://github.com/farhanrhine/travel-planner-ai-agent-gcp.git
+cd travel-planner-ai-agent-gcp
 uv sync
 ```
 
