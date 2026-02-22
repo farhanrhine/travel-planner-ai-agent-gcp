@@ -1,13 +1,16 @@
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
-from src.config.config import GROQ_API_KEY
+# from src.config.config import GROQ_API_KEY
+from dotenv import load_dotenv
 
+load_dotenv()
 
 llm = ChatGroq(
-    groq_api_key = GROQ_API_KEY,
     model= "qwen/qwen3-32b",
     temperature=0.3
-) # type: ignore
+)
+
+#  groq_api_key = GROQ_API_KEY,
 
 
 itnineary_prompt = ChatPromptTemplate([
