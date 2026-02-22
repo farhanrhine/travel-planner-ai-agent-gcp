@@ -145,10 +145,13 @@ def parse_voice_input(transcript: str) -> dict:
         {
             "role": "system",
             "content": (
-                "Extract the city and interests from the user's travel request. "
+                "You are a travel data extractor. "
+                "I will give you a voice transcript. Extract the specific CITY and a list of INTERESTS. "
+                "If the user says a country or region (like Japan), try to identify the main city mentioned (like Tokyo) "
+                "or use the most prominent city. "
                 "Return ONLY a JSON object like: "
-                '{"city": "Dubai", "interests": ["food", "history", "adventure"]}. '
-                "No explanation, no thinking tags, no markdown."
+                '{"city": "Tokyo", "interests": ["anime", "food"]}. '
+                "No processing talk, no markdown."
             ),
         },
         {"role": "user", "content": transcript},

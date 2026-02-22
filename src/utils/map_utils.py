@@ -1,5 +1,6 @@
 """Map utilities for generating premium route maps from location names."""
 
+import re as _re
 import folium
 from folium import DivIcon
 from geopy.geocoders import Nominatim
@@ -29,54 +30,75 @@ ROUTE_COLORS = [
 
 def geocode_locations(locations: list[str], city: str) -> list[dict]:
     """Convert location names to lat/lng coordinates.
-
+    
     Args:
         locations: List of place/location names.
-        city: The city context (appended for better geocoding accuracy).
-
-    Returns:
-        List of dicts with name, lat, lng for each successfully geocoded location.
+        city: The city context.
     """
     results = []
+    
+    # Clean the city name (remove "take me", "trip to", etc. if they leaked in)
+    clean_city = _re.sub(r"(?i)take me to|plan a trip to|trip to|go to|in ", "", city).strip()
+    
     for place in locations:
         try:
-            query = f"{place}, {city}"
+            # ONLY search within the specific city to avoid global jumps
+            query = f"{place}, {clean_city}"
             location = geocode(query)
+            
             if location:
                 results.append({
                     "name": place,
                     "lat": location.latitude,
                     "lng": location.longitude,
                 })
-                logger.info(f"Geocoded: {place} -> ({location.latitude}, {location.longitude})")
+                logger.info(f"Geocoded: {place} ({clean_city}) -> ({location.latitude}, {location.longitude})")
             else:
-                logger.warning(f"Could not geocode: {place}")
+                logger.warning(f"Could not find '{place}' in '{clean_city}'")
         except Exception as e:
             logger.error(f"Geocoding error for {place}: {e}")
     return results
 
 
-def _numbered_icon(number: int, color: str) -> DivIcon:
-    """Create a circular numbered marker icon with CSS styling."""
+def _numbered_icon(number: int, name: str, color: str) -> DivIcon:
+    """Create a circular numbered marker icon with a place name label below it."""
+    # Escape single quotes in name for HTML safety
+    safe_name = name.replace("'", "&#39;")
     return DivIcon(
-        icon_size=(32, 32),
-        icon_anchor=(16, 16),
+        icon_size=(150, 60),
+        icon_anchor=(75, 16),
         html=f'''
-        <div style="
-            background: {color};
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-        ">{number}</div>
+        <div style="display: flex; flex-direction: column; align-items: center; width: 150px;">
+            <div style="
+                background: {color};
+                color: white;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 14px;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                border: 3px solid white;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+                flex-shrink: 0;
+            ">{number}</div>
+            <div style="
+                background: rgba(30, 41, 59, 0.85);
+                color: white;
+                padding: 2px 8px;
+                border-radius: 6px;
+                font-size: 11px;
+                font-weight: 600;
+                margin-top: 4px;
+                white-space: nowrap;
+                border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                pointer-events: none;
+            ">{safe_name}</div>
+        </div>
         ''',
     )
 
@@ -177,7 +199,7 @@ def create_route_map(geocoded_locations: list[dict]) -> folium.Map:
             location=[loc["lat"], loc["lng"]],
             popup=folium.Popup(_popup_html(stop_num, loc["name"], total), max_width=250),
             tooltip=f"Stop {stop_num}: {loc['name']}",
-            icon=_numbered_icon(stop_num, color),
+            icon=_numbered_icon(stop_num, loc["name"], color),
         ).add_to(route_map)
 
     # --- Add START label above first marker ---
