@@ -5,7 +5,7 @@ metadata:
   labels:
     app: streamlit
 spec:
-  replicas: 1
+  replicas: 1 # 1 pod  but i can increase multiple pods that the main purpose of using kubernetes for scaling and load balancing so based on user traffic i can increase the number of pods and kubernetes will automatically load balance the traffic between the pods
   selector:
     matchLabels:
       app: streamlit
