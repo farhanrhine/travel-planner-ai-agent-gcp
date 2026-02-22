@@ -1,6 +1,7 @@
 """Audio utilities for speech-to-text and text-to-speech using Groq."""
 
 from groq import Groq
+from src.config.config import STT_MODEL, TTS_MODEL
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -22,7 +23,7 @@ def transcribe_audio(audio_bytes: bytes) -> str:
 
     transcription = client.audio.transcriptions.create(
         file=("recording.wav", audio_bytes),
-        model="whisper-large-v3-turbo",
+        model=STT_MODEL,
         language="en",
     )
 
@@ -47,7 +48,7 @@ def text_to_speech(text: str) -> bytes:
         text = text[:1000] + "..."
 
     response = client.audio.speech.create(
-        model="canopylabs/orpheus-v1-english",
+        model=TTS_MODEL,
         input=text,
         voice="diana",
         response_format="wav",

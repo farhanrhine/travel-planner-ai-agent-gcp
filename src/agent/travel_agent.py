@@ -8,6 +8,7 @@ import re as _re
 from langchain.agents import create_agent
 from langchain_groq import ChatGroq
 from langchain_core.messages import AIMessageChunk
+from src.config.config import LLM_MODEL
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -24,7 +25,7 @@ TRAVEL_SYSTEM_PROMPT = (
 
 # --- LLM ---
 model = ChatGroq(
-    model="qwen/qwen3-32b",
+    model=LLM_MODEL,
     temperature=0.3,
     max_tokens=2000,
     timeout=30,

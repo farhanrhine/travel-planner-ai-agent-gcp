@@ -129,7 +129,7 @@ uv run python main.py
 3. **Agent**: `create_agent` invokes the Groq LLM to generate the detailed travel plan.
 4. **Streaming**: The response streams in real-time, with AI reasoning hidden behind a toggle expander.
 5. **TTS**: After generation, the LLM creates a short narrated summary, which **Orpheus** converts to audio for playback.
-6. **MAPPING**: The AI extracts location names from the plan, geocodes them via **Nominatim**, and plots them on an **interactive Folium map**.
+6. **MAPPING**: The AI extracts location names from the plan, geocodes them via **Nominatim**, and plots them on an **interactive Folium map** with numbered stops and **visible place labels**.
 
 ## Docker
 
