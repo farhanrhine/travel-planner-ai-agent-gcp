@@ -13,13 +13,22 @@ __pycache__/
 *.pyc
 *.pyo
 *.egg-info/
-AI_TRAVEL_AGENT.egg-info/
 
 # IDE
 .idea/
 .vscode/
-*.swp
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Dev tools (not needed in Docker image)
+.agent/
+.agents/
+skills-lock.json
+*.excalidraw
+*.png
+*.md
+.git/
+.gitignore
+FULL DOCUMENTATION.md
