@@ -23,3 +23,9 @@ AI_TRAVEL_AGENT.egg-info/
 # OS
 .DS_Store
 Thumbs.db
+
+# Agent skills & dev tools
+.agent/
+.agents/
+skills-lock.json
+*.excalidraw
