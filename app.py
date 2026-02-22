@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-st.set_page_config(page_title="AI Travel Agent Planner", page_icon="✈️", layout="centered")
+st.set_page_config(page_title="AI Travel Agent Planner", page_icon="✈️", layout="wide")
 st.title("✈️ AI Travel Agent Planner")
 st.caption("Your smart AI agent that plans the perfect day trip — just tell it where and what you love!")
 
@@ -28,7 +28,7 @@ for entry in st.session_state.chat_history:
             with st.expander("🗺️ View Route Map", expanded=True):
                 route_map = create_route_map(entry["map_data"])
                 if route_map:
-                    st_folium(route_map, use_container_width=True, height=400, returned_objects=[])
+                    st_folium(route_map, use_container_width=True, height=500, returned_objects=[])
 
 # --- Input Form ---
 with st.form("planner_form", clear_on_submit=True):
@@ -131,7 +131,7 @@ if submitted:
                                 route_map = create_route_map(geocoded)
                                 if route_map:
                                     st.markdown("### 🗺️ Your Route Map")
-                                    st_folium(route_map, use_container_width=True, height=400, returned_objects=[])
+                                    st_folium(route_map, use_container_width=True, height=500, returned_objects=[])
                     except Exception as e:
                         st.info(f"Could not generate map: {e}")
 
