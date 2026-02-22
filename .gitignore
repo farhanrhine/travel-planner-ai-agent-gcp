@@ -23,3 +23,7 @@ AI_TRAVEL_AGENT.egg-info/
 # OS
 .DS_Store
 Thumbs.db
+
+# Personal docs (not for GitHub)
+FULL-DOCUMENTATION-deployment.md
+understanding.md

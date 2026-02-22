@@ -66,7 +66,6 @@ travel-planner-ai-agent/
 ├── workflow.png                  # Project workflow diagram
 ├── app-flow.png                  # App flow diagram
 ├── workflow.excalidraw           # Editable workflow (Excalidraw)
-└── FULL DOCUMENTATION.md         # Detailed project documentation
 ```
 
 ### ⚠️ Agent Skills
