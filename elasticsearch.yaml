@@ -28,12 +28,12 @@ spec:
     spec:
       containers:
         - name: elasticsearch
-          image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+          image: docker.elastic.co/elasticsearch/elasticsearch:7.17.18
           env:
             - name: discovery.type
               value: single-node
             - name: ES_JAVA_OPTS
-              value: "-Xms512m -Xmx512m"
+              value: "-Xms512m -Xmx512m -XX:-UseContainerSupport"
             - name: xpack.security.enabled
               value: "false"
           ports:
